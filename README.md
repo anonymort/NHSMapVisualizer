@@ -13,4 +13,5 @@ This project is a Flask web application that visualizes NHS Trust MAPs governanc
 
 - `main.py`: Main application script.
 - `templates/index.html`: HTML template for the main page.
-- `static
+- `static/styles.css`: CSS styles for the web application.
+- `static/map.js`: JavaScript code for initializing the Google Map and handling dynamic interactions.
