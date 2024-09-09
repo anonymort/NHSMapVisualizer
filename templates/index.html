@@ -44,22 +44,22 @@
             color: blue;
             cursor: pointer;
             text-decoration: none;
-            font-size: 0.75em; /* Reduce size by 25% */
-            margin-left: 10px; /* Add some space between "Name" and the link */
+            font-size: 0.75em;
+            margin-left: 10px;
         }
         .policy-link:hover {
             text-decoration: underline;
         }
         .title {
             font-size: 1.5em;
-            margin: 0; /* Remove top and bottom margin */
+            margin: 0;
         }
         .subtitle {
             font-size: 1em;
             color: blue;
             text-decoration: none;
-            margin: 0; /* Remove margin */
-            margin-bottom: 20px; /* Add previously existing bottom margin */
+            margin: 0;
+            margin-bottom: 20px;
         }
         .subtitle:hover {
             text-decoration: underline;
@@ -82,7 +82,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Data will be populated here -->
             </tbody>
         </table>
     </div>
@@ -123,12 +122,12 @@
             for (let row of rows) {
                 row.classList.remove('highlight');
             }
-            rows[index + 1].classList.add('highlight'); // +1 because of header row
+            rows[index + 1].classList.add('highlight');
         }
         function scrollToRow(index) {
             const tableSection = document.getElementById('table-section');
             const rows = document.getElementById('trusts-table').getElementsByTagName('tr');
-            const targetRow = rows[index + 1]; // +1 because of header row
+            const targetRow = rows[index + 1];
             tableSection.scrollTop = targetRow.offsetTop - tableSection.offsetTop;
         }
         window.onload = initMap;
