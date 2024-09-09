@@ -3,17 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NHS Trust Map</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>NHS Trust Data</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}" async defer></script>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            flex: 1;
+        }
+        #table-section {
+            flex: 0.7;
+            overflow-y: scroll;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .highlight {
+            background-color: #f9f9a6;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .policy-link {
+            color: blue;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.75em; /* Reduce size by 25% */
+            margin-left: 10px; /* Add some space between "Name" and the link */
+        }
+        .policy-link:hover {
+            text-decoration: underline;
+        }
+        .title {
+            font-size: 1.5em;
+            margin: 0; /* Remove top and bottom margin */
+        }
+        .subtitle {
+            font-size: 1em;
+            color: blue;
+            text-decoration: none;
+            margin: 0; /* Remove margin */
+            margin-bottom: 20px; /* Add previously existing bottom margin */
+        }
+        .subtitle:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>NHS Trust Map</h1>
-    </header>
-    <main>
-        <div id="map"></div>
-    </main>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
-    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <div id="map"></div>
+    <div id="table-section">
+        <h1 class="title">PA/AA Governance Map</h1>
+        <a class="subtitle" href="https://www.x.com/drmattuk" target="_blank">Created by Dr Matt Kneale</a>
+        <table id="trusts-table">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                        <a href="#" class="policy-link">(Link to Governance Policy)</a>
+                    </th>
+                    <th>Total PAs and AAs</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        let map;
+        let markers = [];
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 54.5, lng: -3.5 },
+                zoom: 6,
+            });
+            fetch('/api/trusts')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('trusts-table').getElementsByTagName('tbody')[0];
+                    data.forEach((trust, index) => {
+                        const marker = new google.maps.Marker({
+                            position: { lat: trust.lat, lng: trust.lng },
+                            map: map,
+                            title: trust.name,
+                        });
+                        markers.push(marker);
+                        const row = tableBody.insertRow();
+                        const nameCell = row.insertCell(0);
+                        const totalCell = row.insertCell(1);
+                        nameCell.innerHTML = trust.name + ` <a href="/trusts/${index}/policy" target="_blank">(1)</a>`;
+                        totalCell.textContent = trust.total;
+                        row.dataset.index = index;
+                        marker.addListener('click', () => {
+                            highlightRow(index);
+                            scrollToRow(index);
+                        });
+                    });
+                });
+        }
+        function highlightRow(index) {
+            const rows = document.getElementById('trusts-table').getElementsByTagName('tr');
+            for (let row of rows) {
+                row.classList.remove('highlight');
+            }
+            rows[index + 1].classList.add('highlight'); // +1 because of header row
+        }
+        function scrollToRow(index) {
+            const tableSection = document.getElementById('table-section');
+            const rows = document.getElementById('trusts-table').getElementsByTagName('tr');
+            const targetRow = rows[index + 1]; // +1 because of header row
+            tableSection.scrollTop = targetRow.offsetTop - tableSection.offsetTop;
+        }
+        window.onload = initMap;
+    </script>
 </body>
 </html>
